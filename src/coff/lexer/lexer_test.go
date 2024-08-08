@@ -6,19 +6,67 @@ import (
 )
 
 func TestNextToken(t *testing.T) {
-	input := `=+(){},;`
+	input := `def four = 4;
+	def zero = 0;
+	
+	def add = fun(x, y) {
+		x + y;
+	};
+	
+	def res = add(four, zero);
+	`
+
+	/*
+	if (0 < 4) {
+		ret true;
+	}
+	else {
+		ret false;
+	}
+
+	0 == 0;
+	4 != 2;
+	*/
 
 	tests := []struct {
 		expectedType	token.TokenType
 		expectedLiteral string
 	} {
+		{token.DEF, "def"},
+		{token.ID, "four"},
 		{token.ASSIGN, "="},
-		{token.PLUS, "+"},
+		{token.INT, "4"},
+		{token.SEMICOLON, ";"},
+		{token.DEF, "def"},
+		{token.ID, "zero"},
+		{token.ASSIGN, "="},
+		{token.INT, "0"},
+		{token.SEMICOLON, ";"},
+		{token.DEF, "def"},
+		{token.ID, "add"},
+		{token.ASSIGN, "="},
+		{token.FUN, "fun"},
 		{token.LPAR, "("},
+		{token.ID, "x"},
+		{token.COMMA, ","},
+		{token.ID, "y"},
 		{token.RPAR, ")"},
 		{token.LBRA, "{"},
+		{token.ID, "x"},
+		{token.PLUS, "+"},
+		{token.ID, "y"},
+		{token.SEMICOLON, ";"},
 		{token.RBRA, "}"},
+		{token.SEMICOLON, ";"},
+		{token.DEF, "def"},
+		{token.ID, "res"},
+		{token.ASSIGN, "="},
+		{token.ID, "add"},
+		{token.LPAR, "("},
+		{token.ID, "four"},
 		{token.COMMA, ","},
+		{token.ID, "zero"},
+		{token.RPAR, ")"},
 		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}
