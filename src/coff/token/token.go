@@ -23,9 +23,10 @@ const (
 	FAC			= "!"
 
 	QUERY		= "?" // TODO: Add to switch
+	MOD 		= "%" // TODO: Add to switch
 
-	LT 			= "<" // TODO: Update in switch
-	GT 			= ">" // TODO: Update in switch
+	LT 			= "<"
+	GT 			= ">"
 
 	EQ			= "=="
 	NOT_EQ		= "!="
@@ -48,6 +49,8 @@ const (
 	
 	IS			= "IS"	// TODO: Add to keywords
 	NOT 		= "NOT" // TODO: Add to keywords
+	NUL			= "NUL" // TODO: Add to keywords
+	NIL			= "NIL" // TODO: Add to keywords
 )
 
 var keywords = map[string]TokenType {
