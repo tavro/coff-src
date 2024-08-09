@@ -61,6 +61,8 @@ func (p *Parser) parseStatement() ast.Statement {
 	switch p.currToken.Type {
 	case token.DEF:
 		return p.parseDefStatement()
+	case token.RET:
+		return p.parseRetStatement()
 	default:
 		return nil
 	}
@@ -78,6 +80,18 @@ func (p *Parser) parseDefStatement() *ast.DefStatement {
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
+	
+	// TODO: Handle expressions
+	for !p.currTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+func (p *Parser) parseRetStatement() *ast.RetStatement {
+	stmt := &ast.RetStatement{Token: p.currToken}
+	p.nextToken()
 	
 	// TODO: Handle expressions
 	for !p.currTokenIs(token.SEMICOLON) {
