@@ -53,6 +53,8 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.COMMA, l.currChar)
 	case '+':
 		tok = newToken(token.PLUS, l.currChar)
+	case '-':
+		tok = newToken(token.MINUS, l.currChar)
 	case '*':
 		tok = newToken(token.MULT, l.currChar)
 	case '/':
