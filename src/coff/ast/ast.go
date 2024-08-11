@@ -5,6 +5,11 @@ import (
 	"bytes"
 )
 
+type IntLiteral struct {
+	Token token.Token
+	Value int64
+}
+
 type Node interface {
 	TokenLiteral() string
 	String() string
@@ -113,3 +118,6 @@ type ExpressionStatement struct {
 func (es *ExpressionStatement) statementNode() {}
 func (es *ExpressionStatement) TokenLiteral() string { return es.Token.Literal }
 
+func (il *IntLiteral) expressionNode() {}
+func (il *IntLiteral) TokenLiteral() string { return il.Token.Literal }
+func (il *IntLiteral) String() string { return il.Token.Literal }

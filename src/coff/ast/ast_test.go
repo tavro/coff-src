@@ -1,3 +1,5 @@
+package ast
+
 import (
 	"coff-src/src/coff/token"
 	"testing"
