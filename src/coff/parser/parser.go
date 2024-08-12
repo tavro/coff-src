@@ -54,17 +54,15 @@ func New(l *lexer.Lexer) *Parser  {
 		errors: []string{},
 	}
 
-	p.nextToken() // to set currToken & peekToken
-	p.nextToken()
-
 	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
 	p.registerPrefix(token.ID, p.parseIdentifier)
 	p.registerPrefix(token.INT, p.parseIntLiteral)
 	p.registerPrefix(token.FAC, p.parsePrefixExpression)
-	p.registerPrefix(token.PLUS, p.parsePrefixExpression)
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
+	p.registerPrefix(token.TRUE, p.parseBoolean)
+	p.registerPrefix(token.FALSE, p.parseBoolean)
 	p.registerPrefix(token.LPAR, p.parseGroupedExpression)
-	
+
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
 	p.registerInfix(token.MINUS, p.parseInfixExpression)
@@ -74,6 +72,9 @@ func New(l *lexer.Lexer) *Parser  {
 	p.registerInfix(token.NOT_EQ, p.parseInfixExpression)
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
+
+	p.nextToken() // to set currToken & peekToken
+	p.nextToken()
 
 	return p
 }
@@ -222,19 +223,22 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 
 func (p *Parser) parseDefStatement() *ast.DefStatement {
 	stmt := &ast.DefStatement{Token: p.currToken}
-	
+
 	if !p.expectPeek(token.ID) {
 		return nil
 	}
 
 	stmt.Name = &ast.Identifier{Token: p.currToken, Value: p.currToken.Literal}
-	
+
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
-	
-	// TODO: Handle expressions
-	for !p.currTokenIs(token.SEMICOLON) {
+
+	p.nextToken()
+
+	stmt.Value = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 
@@ -243,10 +247,12 @@ func (p *Parser) parseDefStatement() *ast.DefStatement {
 
 func (p *Parser) parseRetStatement() *ast.RetStatement {
 	stmt := &ast.RetStatement{Token: p.currToken}
+
 	p.nextToken()
-	
-	// TODO: Handle expressions
-	for !p.currTokenIs(token.SEMICOLON) {
+
+	stmt.RetValue = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 
@@ -286,4 +292,8 @@ func (p *Parser) parseGroupedExpression() ast.Expression {
 	}
 
 	return exp
+}
+
+func (p *Parser) parseBoolean() ast.Expression {
+	return &ast.Boolean{Token: p.currToken, Value: p.currTokenIs(token.TRUE)}
 }
