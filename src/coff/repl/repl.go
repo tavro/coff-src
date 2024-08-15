@@ -7,12 +7,14 @@ import (
 	"coff-src/src/coff/lexer"
 	"coff-src/src/coff/parser"
 	"coff-src/src/coff/eval"
+	"coff-src/src/coff/object"
 )
 
 const PROMPT = ">> "
 
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
+	env := object.NewEnv()
 	
 	for {
 		fmt.Printf(PROMPT)
@@ -31,8 +33,8 @@ func Start(in io.Reader, out io.Writer) {
 			printParserErrors(out, p.Errors())
 			continue
 		}
-	
-		evaluated := eval.Eval(program)
+		
+		evaluated := eval.Eval(program, env)
 		if evaluated != nil {
 			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")
