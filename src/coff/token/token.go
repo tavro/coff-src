@@ -13,6 +13,7 @@ const (
 
 	ID			= "ID"
 	INT			= "INT"
+	STR			= "STR"
 
 	ASSIGN		= "="
 	PLUS		= "+" // Change to ADD?

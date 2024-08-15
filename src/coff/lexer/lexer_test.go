@@ -14,19 +14,9 @@ func TestNextToken(t *testing.T) {
 	};
 	
 	def res = add(four, zero);
+	"foobar"
+	"foo bar"
 	`
-
-	/*
-	if (0 < 4) {
-		ret true;
-	}
-	else {
-		ret false;
-	}
-
-	0 == 0;
-	4 != 2;
-	*/
 
 	tests := []struct {
 		expectedType	token.TokenType
@@ -68,6 +58,8 @@ func TestNextToken(t *testing.T) {
 		{token.ID, "zero"},
 		{token.RPAR, ")"},
 		{token.SEMICOLON, ";"},
+		{token.STR, "foobar"},
+		{token.STR, "foo bar"},
 		{token.EOF, ""},
 	}
 

@@ -16,7 +16,14 @@ const (
 	RET_VAL_OBJ = "RET_VAL"
 	ERR_OBJ = "ERR"
 	FUN_OBJ = "FUN"
+	STR_OBJ = "STR"
+	STD_OBJ = "STD"
 )
+
+type StdFunction func(args ...Object) Object
+type Std struct {
+	Fun StdFunction
+}
 
 type Function struct {
 	Parameters []*ast.Identifier
@@ -35,6 +42,10 @@ type RetVal struct {
 type Object interface {
 	Type() ObjectType
 	Inspect() string
+}
+
+type Str struct {
+	Value string
 }
 
 type Int struct {
@@ -83,3 +94,8 @@ func (f *Function) Inspect() string {
 	return out.String()
 }
 
+func (s *Str) Type() ObjectType { return STR_OBJ }
+func (s *Str) Inspect() string { return s.Value }
+
+func (std *Std) Type() ObjectType { return STD_OBJ }
+func (std *Std) Inspect() string { return "std function" }

@@ -48,6 +48,11 @@ type PrefixExpression struct {
 	Right Expression
 }
 
+type StrLiteral struct {
+	Token token.Token
+	Value string
+}
+
 type IntLiteral struct {
 	Token token.Token
 	Value int64
@@ -257,3 +262,7 @@ func (ce *CallExpression) String() string {
 
 	return out.String()
 }
+
+func (sl *StrLiteral) expressionNode() {}
+func (sl *StrLiteral) TokenLiteral() string { return sl.Token.Literal }
+func (sl *StrLiteral) String() string { return sl.Token.Literal }
