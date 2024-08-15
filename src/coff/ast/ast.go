@@ -101,8 +101,8 @@ func (rs *RetStatement) String() string {
 	var out bytes.Buffer
 	out.WriteString(rs.TokenLiteral() + " ")
 	
-	if rs.RetValue != nil {
-		out.WriteString(rs.RetValue.String())
+	if rs.RetVal != nil {
+		out.WriteString(rs.RetVal.String())
 	}
 
 	out.WriteString(";")
@@ -147,7 +147,7 @@ func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
 
 type RetStatement struct {
 	Token token.Token
-	RetValue Expression
+	RetVal Expression
 }
 
 func (rs *RetStatement) statementNode() {}

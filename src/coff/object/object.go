@@ -10,7 +10,17 @@ const (
 	INT_OBJ = "INT"
 	BOOL_OBJ = "BOOL"
 	NULL_OBJ = "NULL"
+	RET_VAL_OBJ = "RET_VAL"
+	ERR_OBJ = "ERR"
 )
+
+type Error struct {
+	Message string
+}
+
+type RetVal struct {
+	Value Object
+}
 
 type Object interface {
 	Type() ObjectType
@@ -37,3 +47,9 @@ func (b *Bool) Type() ObjectType { return BOOL_OBJ }
 
 func (n *Null) Inspect() string { return "null" }
 func (n *Null) Type() ObjectType { return NULL_OBJ }
+
+func (rv *RetVal) Type() ObjectType { return RET_VAL_OBJ }
+func (rv *RetVal) Inspect() string { return rv.Value.Inspect() }
+
+func (e *Error) Type() ObjectType { return ERR_OBJ }
+func (e *Error) Inspect() string { return "ERROR: " + e.Message }

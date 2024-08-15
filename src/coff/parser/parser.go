@@ -371,7 +371,7 @@ func (p *Parser) parseRetStatement() *ast.RetStatement {
 
 	p.nextToken()
 
-	stmt.RetValue = p.parseExpression(LOWEST)
+	stmt.RetVal = p.parseExpression(LOWEST)
 
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()

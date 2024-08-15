@@ -70,7 +70,7 @@ func TestRetStatements(t *testing.T) {
 		if returnStmt.TokenLiteral() != "ret" {
 			t.Fatalf("returnStmt.TokenLiteral is not 'ret', got %q", returnStmt.TokenLiteral())
 		}
-		if testLiteralExpression(t, returnStmt.RetValue, tt.expectedValue) {
+		if testLiteralExpression(t, returnStmt.RetVal, tt.expectedValue) {
 			return
 		}
 	}
