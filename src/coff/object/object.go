@@ -2,6 +2,9 @@ package object
 
 import (
 	"fmt"
+	"coff-src/src/coff/ast"
+	"strings"
+	"bytes"
 )
 
 type ObjectType string
@@ -12,7 +15,14 @@ const (
 	NULL_OBJ = "NULL"
 	RET_VAL_OBJ = "RET_VAL"
 	ERR_OBJ = "ERR"
+	FUN_OBJ = "FUN"
 )
+
+type Function struct {
+	Parameters []*ast.Identifier
+	Body *ast.BlockStatement
+	Env *Env
+}
 
 type Error struct {
 	Message string
@@ -53,3 +63,23 @@ func (rv *RetVal) Inspect() string { return rv.Value.Inspect() }
 
 func (e *Error) Type() ObjectType { return ERR_OBJ }
 func (e *Error) Inspect() string { return "ERROR: " + e.Message }
+
+func (f *Function) Type() ObjectType { return FUN_OBJ }
+func (f *Function) Inspect() string {
+	var out bytes.Buffer
+	params := []string{}
+
+	for _, p := range f.Parameters {
+		params = append(params, p.String())
+	}
+
+	out.WriteString("fn")
+	out.WriteString("(")
+	out.WriteString(strings.Join(params, ", "))
+	out.WriteString(") {\n")
+	out.WriteString(f.Body.String())
+	out.WriteString("\n}")
+
+	return out.String()
+}
+
