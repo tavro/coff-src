@@ -16,6 +16,7 @@ func TestNextToken(t *testing.T) {
 	def res = add(four, zero);
 	"foobar"
 	"foo bar"
+	[1, 2];
 	`
 
 	tests := []struct {
@@ -60,6 +61,12 @@ func TestNextToken(t *testing.T) {
 		{token.SEMICOLON, ";"},
 		{token.STR, "foobar"},
 		{token.STR, "foo bar"},
+		{token.LBRACK, "["},
+		{token.INT, "1"},
+		{token.COMMA, ","},
+		{token.INT, "2"},
+		{token.RBRACK, "]"},
+		{token.SEMICOLON, ";"},
 		{token.EOF, ""},
 	}
 

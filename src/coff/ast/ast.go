@@ -6,6 +6,17 @@ import (
 	"bytes"
 )
 
+type IdxExpression struct {
+	Token token.Token
+	Left Expression
+	Index Expression
+}
+
+type ArrLiteral struct {
+	Token token.Token
+	Elements []Expression
+}
+
 type CallExpression struct {
 	Token token.Token
 	Function Expression
@@ -266,3 +277,33 @@ func (ce *CallExpression) String() string {
 func (sl *StrLiteral) expressionNode() {}
 func (sl *StrLiteral) TokenLiteral() string { return sl.Token.Literal }
 func (sl *StrLiteral) String() string { return sl.Token.Literal }
+
+func (al *ArrLiteral) expressionNode() {}
+func (al *ArrLiteral) TokenLiteral() string { return al.Token.Literal }
+func (al *ArrLiteral) String() string {
+	var out bytes.Buffer
+	elements := []string{}
+	for _, el := range al.Elements {
+		elements = append(elements, el.String())
+	}
+
+	out.WriteString("[")
+	out.WriteString(strings.Join(elements, ", "))
+	out.WriteString("]")
+
+	return out.String()
+}
+
+func (ie *IdxExpression) expressionNode() {}
+func (ie *IdxExpression) TokenLiteral() string { return ie.Token.Literal }
+func (ie *IdxExpression) String() string {
+	var out bytes.Buffer
+	
+	out.WriteString("(")
+	out.WriteString(ie.Left.String())
+	out.WriteString("[")
+	out.WriteString(ie.Index.String())
+	out.WriteString("])")
+
+	return out.String()
+}

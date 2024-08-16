@@ -39,6 +39,8 @@ const (
 	RPAR 		= ")"
 	LBRA		= "{"
 	RBRA		= "}"
+	LBRACK		= "["
+	RBRACK		= "]"
 
 	FUN			= "FUN"
 	DEF			= "DEF"

@@ -49,6 +49,10 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.LBRA, l.currChar)
 	case '}':
 		tok = newToken(token.RBRA, l.currChar)
+	case '[':
+		tok = newToken(token.LBRACK, l.currChar)
+	case ']':
+		tok = newToken(token.RBRACK, l.currChar)
 	case ',':
 		tok = newToken(token.COMMA, l.currChar)
 	case '+':

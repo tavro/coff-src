@@ -18,7 +18,12 @@ const (
 	FUN_OBJ = "FUN"
 	STR_OBJ = "STR"
 	STD_OBJ = "STD"
+	ARR_OBJ = "ARR"
 )
+
+type Arr struct {
+	Elements []Object
+}
 
 type StdFunction func(args ...Object) Object
 type Std struct {
@@ -99,3 +104,19 @@ func (s *Str) Inspect() string { return s.Value }
 
 func (std *Std) Type() ObjectType { return STD_OBJ }
 func (std *Std) Inspect() string { return "std function" }
+
+func (a *Arr) Type() ObjectType { return ARR_OBJ }
+func (a *Arr) Inspect() string {
+	var out bytes.Buffer
+	elements := []string{}
+
+	for _, e := range a.Elements {
+		elements = append(elements, e.Inspect())
+	}
+
+	out.WriteString("[")
+	out.WriteString(strings.Join(elements, ", "))
+	out.WriteString("]")
+
+	return out.String()
+}

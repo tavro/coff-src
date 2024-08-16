@@ -16,7 +16,8 @@ const (
 	SUM
 	PRODUCT
 	PREFIX
-	CALL // 7
+	CALL
+	INDEX // 8
 )
 
 var precedences = map[token.TokenType]int {
@@ -29,6 +30,7 @@ var precedences = map[token.TokenType]int {
 	token.DIV:		PRODUCT,
 	token.MULT:		PRODUCT,
 	token.LPAR: 	CALL,
+	token.LBRACK: 	INDEX,
 }
 
 type (
@@ -65,6 +67,7 @@ func New(l *lexer.Lexer) *Parser  {
 	p.registerPrefix(token.IF, p.parseIfExpression)
 	p.registerPrefix(token.FUN, p.parseFunctionLiteral)
 	p.registerPrefix(token.STR, p.parseStrLiteral)
+	p.registerPrefix(token.LBRACK, p.parseArrLiteral)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
@@ -76,11 +79,53 @@ func New(l *lexer.Lexer) *Parser  {
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
 	p.registerInfix(token.LPAR, p.parseCallExpression)
+	p.registerInfix(token.LBRACK, p.parseIdxExpression)
 
 	p.nextToken() // to set currToken & peekToken
 	p.nextToken()
 
 	return p
+}
+
+func (p *Parser) parseIdxExpression(left ast.Expression) ast.Expression {
+	exp := &ast.IdxExpression{Token: p.currToken, Left: left}
+	p.nextToken()
+
+	exp.Index = p.parseExpression(LOWEST)
+	if !p.expectPeek(token.RBRACK) {
+		return nil
+	}
+
+	return exp
+}
+
+func (p *Parser) parseArrLiteral() ast.Expression {
+	array := &ast.ArrLiteral{Token: p.currToken}
+	array.Elements = p.parseExpressionList(token.RBRACK)
+	return array
+}
+
+func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
+	list := []ast.Expression{}
+	
+	if p.peekTokenIs(end) {
+		p.nextToken()
+		return list
+	}
+	p.nextToken()
+	
+	list = append(list, p.parseExpression(LOWEST))
+	for p.peekTokenIs(token.COMMA) {
+		p.nextToken()
+		p.nextToken()
+		list = append(list, p.parseExpression(LOWEST))
+	}
+
+	if !p.expectPeek(end) {
+		return nil
+	}
+
+	return list
 }
 
 func (p *Parser) parseStrLiteral() ast.Expression {
@@ -112,7 +157,7 @@ func (p *Parser) parseCallArguments() []ast.Expression {
 
 func (p *Parser) parseCallExpression(function ast.Expression) ast.Expression {
 	exp := &ast.CallExpression{Token: p.currToken, Function: function}
-	exp.Arguments = p.parseCallArguments()
+	exp.Arguments = p.parseExpressionList(token.RPAR)
 	
 	return exp
 }
