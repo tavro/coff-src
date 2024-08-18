@@ -1,6 +1,7 @@
 package eval
 
 import (
+	"fmt"
 	"coff-src/src/coff/object"
 )
 
@@ -73,7 +74,7 @@ var stds = map[string]*object.Std{
 				copy(newElements, arr.Elements[1:length])
 				return &object.Arr{Elements: newElements}
 			}
-			
+
 			return NULL
 		},
 	},
@@ -95,6 +96,15 @@ var stds = map[string]*object.Std{
 			newElements[length] = args[1]
 			
 			return &object.Arr{Elements: newElements}
+		},
+	},
+	"print": &object.Std{
+		Fun: func(args ...object.Object) object.Object {
+			for _, arg := range args {
+				fmt.Println(arg.Inspect())
+			}
+			
+			return NULL
 		},
 	},
 }

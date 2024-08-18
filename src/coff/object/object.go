@@ -5,6 +5,7 @@ import (
 	"coff-src/src/coff/ast"
 	"strings"
 	"bytes"
+	"hash/fnv"
 )
 
 type ObjectType string
@@ -19,7 +20,26 @@ const (
 	STR_OBJ = "STR"
 	STD_OBJ = "STD"
 	ARR_OBJ = "ARR"
+	HASH_OBJ = "HASH"
 )
+
+type Hashable interface {
+	HashKey() HashKey
+}
+
+type Hash struct {
+	Pairs map[HashKey]HashPair
+}
+
+type HashPair struct {
+	Key Object
+	Value Object
+}
+
+type HashKey struct {
+	Type ObjectType
+	Value uint64
+}
 
 type Arr struct {
 	Elements []Object
@@ -118,5 +138,42 @@ func (a *Arr) Inspect() string {
 	out.WriteString(strings.Join(elements, ", "))
 	out.WriteString("]")
 
+	return out.String()
+}
+
+func (b *Bool) HashKey() HashKey {
+	var value uint64
+	if b.Value {
+		value = 1
+	} else {
+		value = 0
+	}
+
+	return HashKey{Type: b.Type(), Value: value}
+}
+
+func (i *Int) HashKey() HashKey {
+	return HashKey{Type: i.Type(), Value: uint64(i.Value)}
+}
+
+func (s *Str) HashKey() HashKey {
+	h := fnv.New64a()
+	h.Write([]byte(s.Value))
+	return HashKey{Type: s.Type(), Value: h.Sum64()}
+}
+
+func (h *Hash) Type() ObjectType { return HASH_OBJ }
+func (h *Hash) Inspect() string {
+	var out bytes.Buffer
+	
+	pairs := []string{}
+	for _, pair := range h.Pairs {
+		pairs = append(pairs, fmt.Sprintf("%s: %s", pair.Key.Inspect(), pair.Value.Inspect()))
+	}
+
+	out.WriteString("{")
+	out.WriteString(strings.Join(pairs, ", "))
+	out.WriteString("}")
+	
 	return out.String()
 }

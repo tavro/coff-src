@@ -7,6 +7,92 @@ import (
 	"testing"
 )
 
+func TestHashIdxExpressions(t *testing.T) {
+	tests := []struct {
+		input string
+		expected interface{}
+	} {
+		{
+			`{"foo": 5}["foo"]`,
+			5,
+		},
+		{
+			`{"foo": 5}["bar"]`,
+			nil,
+		},
+		{
+			`def key = "foo"; {"foo": 5}[key]`,
+			5,
+		},
+		{
+			`{}["foo"]`,
+			nil,
+		},
+		{
+			`{5: 5}[5]`,
+			5,
+		},
+		{
+			`{true: 5}[true]`,
+			5,
+		},
+		{
+			`{false: 5}[false]`,
+			5,
+		},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, ok := tt.expected.(int)
+
+		if ok {
+			testIntObject(t, evaluated, int64(integer))
+		} else {
+			testNullObject(t, evaluated)
+		}
+	}
+}
+
+func TestHashLiterals(t *testing.T) {
+	input := `def two = "two";
+	{
+	"one": 10 - 9,
+	two: 1 + 1,
+	"thr" + "ee": 6 / 2,
+	4: 4,
+	true: 5,
+	false: 6
+	}`
+
+	evaluated := testEval(input)
+	result, ok := evaluated.(*object.Hash)
+	if !ok {
+		t.Fatalf("Eval didn't return Hash. got=%T (%+v)", evaluated, evaluated)
+	}
+
+	expected := map[object.HashKey]int64{
+		(&object.Str{Value: "one"}).HashKey(): 1,
+		(&object.Str{Value: "two"}).HashKey(): 2,
+		(&object.Str{Value: "three"}).HashKey(): 3,
+		(&object.Int{Value: 4}).HashKey(): 4,
+		TRUE.HashKey(): 5,
+		FALSE.HashKey(): 6,
+	}
+
+	if len(result.Pairs) != len(expected) {
+		t.Fatalf("Hash has wrong num of pairs. got=%d", len(result.Pairs))
+	}
+
+	for expectedKey, expectedValue := range expected {
+		pair, ok := result.Pairs[expectedKey]
+		if !ok {
+			t.Errorf("no pair for given key in Pairs")
+		}
+		testIntObject(t, pair.Value, expectedValue)
+	}
+}
+
 func TestEvalIntExpression(t *testing.T) {
 	tests := []struct {
 		input string
@@ -108,6 +194,10 @@ func TestErrorHandling(t *testing.T) {
 		{
 			`"Hello" - "World"`,
 			"unknown operator: STR - STR",
+		},
+		{
+			`{"name": "Monkey"}[fun(x) { x }];`,
+			"unusable as hash key: FUN",
 		},
 	}
 		
